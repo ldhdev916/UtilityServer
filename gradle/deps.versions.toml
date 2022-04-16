@@ -1,0 +1,17 @@
+[versions]
+kotest = "5.2.2"
+
+[libraries]
+spring-web = { module = "org.springframework.boot:spring-boot-starter-web" }
+spring-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-mockk = "com.ninja-squad:springmockk:3.1.1"
+
+jackson = { module = "com.fasterxml.jackson.module:jackson-module-kotlin" }
+
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
+kotlin-scripting = { module = "org.jetbrains.kotlin:kotlin-scripting-jsr223" }
+
+mockk = "io.mockk:mockk:1.12.3"
+
+[bundles]
+tests = ["spring-test", "mockk", "spring-mockk", "kotlin-test"]
