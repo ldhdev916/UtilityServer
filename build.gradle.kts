@@ -3,8 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.6.6"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.spring") version "1.6.10"
+    kotlin("jvm") version "1.6.21"
+    kotlin("plugin.spring") version "1.6.21"
+    kotlin("plugin.serialization") version "1.6.21"
 }
 
 group = "com.ldhdev"
@@ -18,13 +19,22 @@ allprojects {
 }
 
 dependencies {
-    implementation(deps.spring.web)
-    implementation(deps.jackson)
-    implementation(deps.kotlin.scripting)
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    testImplementation(deps.bundles.tests) {
+    implementation("org.jetbrains.kotlin:kotlin-scripting-jsr223")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
+    val fuel = "2.3.1"
+    implementation("com.github.kittinunf.fuel:fuel:$fuel")
+    implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:$fuel")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
+    testImplementation("com.ninja-squad:springmockk:3.1.1")
+    testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.12.3")
 }
 
 tasks {
@@ -35,7 +45,7 @@ tasks {
 
     withType<KotlinCompile> {
         kotlinOptions {
-            freeCompilerArgs = listOf("-Xjsr305=strict")
+            freeCompilerArgs = listOf("-Xjsr305=strict", "-opt-in=kotlin.RequiresOptIn")
             jvmTarget = "11"
         }
     }
