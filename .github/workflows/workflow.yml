@@ -9,7 +9,7 @@ jobs:
         uses: haythem/public-ip@v1.2
       - name: Add Github Actions IP to Security Group
         run: aws ec2 authorize-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-        with:
+        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ap-northeast-2
