@@ -53,4 +53,8 @@ tasks {
     bootJar {
         requiresUnpack("**/kotlin-compiler-embeddable-*.jar")
     }
+
+    jar {
+        enabled = false
+    }
 }
