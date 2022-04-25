@@ -20,7 +20,9 @@ jobs:
         with:
           key: ${{ secrets.AWS_SSH_KEY }}
           host: ${{ secrets.REMOTE_HOST }}
-          username: ubuntu
+          username: ${{ secrets.REMOTE_USER }}
           port: 22
+          script: |
+            ls -al
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
