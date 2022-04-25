@@ -15,20 +15,19 @@ jobs:
         run: aws ec2 authorize-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Build
-        id: build
-        run: |
-          chmod +x ./gradlew
-          ./gradlew build
-          cd ./build/libs
-          base64 UtilityServer-*.jar
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
+          command_timeout: 30m
           key: ${{ secrets.AWS_SSH_KEY }}
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           port: 22
           script: |
+            cd UtilityServer/
+            chmod +x ./gradlew
+            ./gradlew clean
+            git pull
+            ./gradlew bootJar
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
