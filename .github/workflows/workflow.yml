@@ -3,16 +3,16 @@ on: [ push ]
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: ap-northeast-2
     steps:
       - name: Get Github Actions IP
         id: ip
         uses: haythem/public-ip@v1.2
       - name: Add Github Actions IP to Security Group
         run: aws ec2 authorize-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-northeast-2
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Deploy to Server
@@ -24,10 +24,8 @@ jobs:
           port: 22
           script: |
             cd UtilityServer/
+            chmod +x ./gradlew
+            ./gradlew clean
             git pull
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-northeast-2
