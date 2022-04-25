@@ -16,10 +16,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Deploy to Server
-        uses: easingthemes/ssh-deploy@main
+        uses: appleboy/ssh-action@master
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.AWS_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
-          REMOTE_USER: ubuntu
+          key: ${{ secrets.AWS_SSH_KEY }}
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ubuntu
+          port: 22
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
