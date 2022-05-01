@@ -39,7 +39,8 @@ class StompChatController(private val template: SimpMessagingTemplate) {
             init(Cipher.ENCRYPT_MODE, publicKey)
         }
 
-        return Base64.getEncoder().encodeToString(cipher.doFinal(Json.encodeToString(joinedPlayers).toByteArray()))
+        val encrypted = cipher.doFinal(Json.encodeToString(joinedPlayers).toByteArray())
+        return Base64.getEncoder().encodeToString(encrypted)
     }
 
     @MessageMapping("/join/{uuid}")
