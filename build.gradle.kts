@@ -21,8 +21,12 @@ allprojects {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-    implementation("org.webjars:stomp-websocket:2.3.3-1")
+    implementation("org.webjars:stomp-websocket:2.3.4")
+
+    implementation("mysql:mysql-connector-java")
 
     implementation("org.jetbrains.kotlin:kotlin-scripting-jsr223")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")

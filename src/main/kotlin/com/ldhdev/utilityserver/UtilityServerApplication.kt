@@ -7,6 +7,5 @@ import org.springframework.boot.runApplication
 class UtilityServerApplication
 
 fun main(args: Array<String>) {
-    System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true")
     runApplication<UtilityServerApplication>(*args)
 }
