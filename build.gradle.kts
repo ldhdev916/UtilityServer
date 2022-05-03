@@ -3,9 +3,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.6.6"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    kotlin("jvm") version "1.6.21"
-    kotlin("plugin.spring") version "1.6.21"
-    kotlin("plugin.serialization") version "1.6.21"
+    val kotlinVersion = "1.6.10"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.spring") version kotlinVersion
+    kotlin("plugin.serialization") version kotlinVersion
+    kotlin("plugin.jpa") version kotlinVersion
 }
 
 group = "com.ldhdev"
@@ -22,6 +24,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.webjars:stomp-websocket:2.3.4")
@@ -42,6 +46,7 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.12.3")
 }
+
 
 tasks {
 

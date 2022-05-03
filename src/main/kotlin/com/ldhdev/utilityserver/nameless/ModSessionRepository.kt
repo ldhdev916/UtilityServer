@@ -1,4 +1,4 @@
-package com.ldhdev.utilityserver.websocket
+package com.ldhdev.utilityserver.nameless
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository

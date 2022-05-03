@@ -1,4 +1,4 @@
-package com.ldhdev.utilityserver.websocket
+package com.ldhdev.utilityserver.nameless
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*
@@ -16,6 +16,8 @@ class ModPlayerSession {
     lateinit var playerUUID: String
 
     lateinit var name: String
+
+    lateinit var version: String
 
     var online = false
 

@@ -1,4 +1,4 @@
-package com.ldhdev.utilityserver.websocket
+package com.ldhdev.utilityserver.nameless
 
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.simp.config.MessageBrokerRegistry

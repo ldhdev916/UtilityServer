@@ -1,6 +1,5 @@
-package com.ldhdev.utilityserver.websocket
+package com.ldhdev.utilityserver.nameless
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.ldhdev.utilityserver.dto.MojangProfile
 import org.apache.logging.log4j.LogManager
 import org.springframework.data.repository.findByIdOrNull
@@ -9,45 +8,20 @@ import org.springframework.messaging.handler.annotation.Header
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.ResponseBody
-import java.io.StringWriter
-import java.security.MessageDigest
-import java.util.*
-import javax.crypto.Cipher
-import javax.crypto.spec.SecretKeySpec
 
 @Controller
 class StompChatController(private val template: SimpMessagingTemplate, private val repository: ModSessionRepository) {
     private val logger = LogManager.getLogger()
-    private val passwordHashed by lazy {
-        val md = MessageDigest.getInstance("SHA-256")
-        val pw = System.getProperty("nameless.adminpw")
-        md.digest(pw.toByteArray())
-    }
-
-    @GetMapping("/nameless/admin/sessions")
-    @ResponseBody
-    fun getSessions(): String {
-        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding").apply {
-            init(Cipher.ENCRYPT_MODE, SecretKeySpec(passwordHashed, "AES"))
-        }
-
-        val writer = StringWriter()
-        writer.use {
-            ObjectMapper().writeValue(it, repository.findAll())
-        }
-        return Base64.getEncoder().encodeToString(cipher.iv + cipher.doFinal(writer.toString().toByteArray()))
-    }
 
     @MessageMapping("/join")
-    fun enter(@Header("uuid") playerUUID: String) {
+    fun enter(@Header("uuid") playerUUID: String, @Header(MOD_VERSION) version: String) {
         val profile = MojangProfile.getFromUUID(playerUUID) ?: return
         val session = repository.findByPlayerUUID(profile.id) ?: ModPlayerSession()
 
         with(session) {
             this.playerUUID = profile.id
             this.name = profile.name
+            this.version = version
             online = true
         }
 
@@ -93,5 +67,6 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
 
     companion object {
         private const val MOD_ID = "mod-uuid"
+        private const val MOD_VERSION = "mod-version"
     }
 }
