@@ -8,7 +8,7 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "mod_player_session")
+@Table(name = "sessions")
 class ModPlayerSession {
 
     @Column(name = "uuid")
