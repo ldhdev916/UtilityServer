@@ -1,6 +1,10 @@
 package com.ldhdev.utilityserver.nameless
 
+import com.ldhdev.utilityserver.db.ModPlayerSession
+import com.ldhdev.utilityserver.db.ModSessionRepository
 import com.ldhdev.utilityserver.dto.MojangProfile
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.apache.logging.log4j.LogManager
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.messaging.handler.annotation.DestinationVariable
@@ -55,11 +59,21 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
         }
     }
 
+    @MessageMapping("/locraw")
+    fun updateLocrawInfo(@Header(MOD_ID) id: String, payload: String?) {
+        val session = repository.findByIdOrNull(id) ?: return
+        session.locraw = payload?.let(Json::decodeFromString)
+        repository.save(session)
+    }
+
     @MessageMapping("/disconnect")
     fun disconnect(@Header(MOD_ID) id: String) {
         val session = repository.findByIdOrNull(id) ?: return
 
-        session.online = false
+        with(session) {
+            online = false
+            locraw = null
+        }
         repository.save(session)
 
         logger.info("$session disconnected")

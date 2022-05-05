@@ -1,4 +1,4 @@
-package com.ldhdev.utilityserver.nameless
+package com.ldhdev.utilityserver.db
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
