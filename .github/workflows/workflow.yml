@@ -18,7 +18,10 @@ jobs:
       - name: Build Jar File
         id: build
         run: |
-          ./gradlew build
+          chmod +x ./gradlew
+          ./gradlew bootJar
+          echo "::set-output name=BASE64::$(base64 ./build/libs/*.jar)"
+      - run: echo ${{ steps.build.outputs.BASE64 }}
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
