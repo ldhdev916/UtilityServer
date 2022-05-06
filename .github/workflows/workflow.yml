@@ -1,5 +1,8 @@
 name: Deploy to EC2
-on: [ push ]
+on:
+  push:
+    tags:
+      - v*
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,11 +19,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Build Jar File
-        id: build
         run: |
           chmod +x ./gradlew
           ./gradlew bootJar
-          echo "::set-output name=BASE64::$(base64 ./build/libs/*.jar | tr -d '\n')"
+      - name: Release Server jar
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.TOKEN }}
+          file: ./build/libs/*.jar
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
@@ -28,6 +37,6 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           port: 22
-          script: echo ${{ steps.build.outputs.BASE64 }} | base64 -d > Server.jar
+          script: echo ${{ github.ref }}
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
