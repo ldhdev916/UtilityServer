@@ -3,7 +3,6 @@ package com.ldhdev.utilityserver
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -27,14 +26,5 @@ internal class AndroidControllerTest {
         val result = controller.executeKotlinScript("dfasd")
 
         assertFalse(result.success)
-    }
-
-    @Test
-    fun saveAndroidFiles_201Created() {
-        val entity = controller.saveAndroidFiles("test.txt", "5".toByteArray())
-
-        assertEquals(entity.statusCodeValue, 201)
-
-        assertTrue(File("android/test.txt").isFile)
     }
 }
