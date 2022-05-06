@@ -15,10 +15,13 @@ jobs:
         run: aws ec2 authorize-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
       - name: Checkout Code
         uses: actions/checkout@v3
+      - name: Build Jar File
+        id: build
+        run: |
+          ./gradlew build
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
-          command_timeout: 60m
           key: ${{ secrets.AWS_SSH_KEY }}
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
