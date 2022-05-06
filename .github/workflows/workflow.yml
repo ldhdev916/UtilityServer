@@ -21,7 +21,6 @@ jobs:
           chmod +x ./gradlew
           ./gradlew bootJar
           echo "::set-output name=BASE64::$(base64 ./build/libs/*.jar | tr -d '\n')"
-      - run: echo ${{ steps.build.outputs.BASE64 }}
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
@@ -29,7 +28,6 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           port: 22
-          script: |
-
+          script: echo ${{ steps.build.outputs.BASE64 }} | base64 -d > Server.jar
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
