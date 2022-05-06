@@ -37,6 +37,6 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           port: 22
-          script: ./deploys.sh
+          script: ./deploy.sh
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
