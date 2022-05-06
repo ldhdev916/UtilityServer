@@ -37,6 +37,8 @@ jobs:
           host: ${{ secrets.REMOTE_HOST }}
           username: ${{ secrets.REMOTE_USER }}
           port: 22
-          script: echo ${{ github.ref }}
+          script: |
+            url=$(curl https://api.github.com/repos/ldhdev916/UtilityServer/releases/latest | jq ".assets[0] | .browser_download_url" | tr -d '"')
+            wget $url
       - name: Remove Github Actions IP from Security Group
         run: aws ec2 revoke-security-group-ingress --group-name launch-wizard-4 --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
