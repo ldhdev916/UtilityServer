@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody
 @Controller
 @RequestMapping("/nameless/admin")
 class NamelessAdminController(private val repository: ModSessionRepository) {
-    @GetMapping("sessions")
+    @GetMapping("/sessions")
     @ResponseBody
     fun showAllSessions(): List<ModPlayerSession> = repository.findAll()
 }

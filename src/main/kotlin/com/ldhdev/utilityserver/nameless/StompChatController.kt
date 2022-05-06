@@ -48,13 +48,7 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
         val receiverSession = repository.findByNameEqualsIgnoreCase(receiverName) ?: return
 
         logger.info("Sending a chat message '$payload' from $session to $receiverSession(${receiverSession.online})")
-        if (!receiverSession.online) {
-            template.convertAndSend(
-                "/topic/chat/$id",
-                "Player ${receiverSession.name} is offline",
-                mapOf("sender" to "Server")
-            )
-        } else {
+        if (receiverSession.online) {
             template.convertAndSend("/topic/chat/${receiverSession.id}", payload, mapOf("sender" to session.name))
         }
     }
