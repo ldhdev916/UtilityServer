@@ -22,7 +22,7 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew bootJar
-      - name: Release Server jar
+      - name: Release Server Jar
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.TOKEN }}
