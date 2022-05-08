@@ -34,6 +34,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlin:kotlin-scripting-jsr223")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
 
     val fuel = "2.3.1"
     implementation("com.github.kittinunf.fuel:fuel:$fuel")

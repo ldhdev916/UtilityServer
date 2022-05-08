@@ -43,13 +43,40 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
     }
 
     @MessageMapping("/chat/{to}")
-    fun sendChatMessage(@Header(MOD_ID) id: String, @DestinationVariable("to") receiverName: String, payload: String) {
+    fun sendChatMessage(
+        @Header(MOD_ID) id: String,
+        @Header(CHAT_ID) chatId: String,
+        @DestinationVariable("to") receiverName: String,
+        payload: String
+    ) {
         val session = repository.findByIdOrNull(id) ?: return
         val receiverSession = repository.findByNameEqualsIgnoreCase(receiverName) ?: return
 
-        logger.info("Sending a chat message '$payload' from $session to $receiverSession(${receiverSession.online})")
-        if (receiverSession.online) {
-            template.convertAndSend("/topic/chat/${receiverSession.id}", payload, mapOf("sender" to session.name))
+        logger.info("Sending a chat message '$payload' from $session to $receiverSession")
+        if (receiverSession.online && session.online) {
+            template.convertAndSend(
+                "/topic/chat/${receiverSession.id}",
+                payload,
+                mapOf("sender" to session.name, CHAT_ID to chatId)
+            )
+        }
+    }
+
+    @MessageMapping("/read/{sender}")
+    fun readChat(
+        @Header(MOD_ID) id: String,
+        @Header(CHAT_ID) chatId: String,
+        @DestinationVariable("sender") sender: String
+    ) {
+        val session = repository.findByIdOrNull(id) ?: return
+        val senderSession = repository.findByNameEqualsIgnoreCase(sender) ?: return
+
+        if (session.online && senderSession.online) {
+            template.convertAndSend(
+                "/topic/read/${senderSession.id}",
+                "",
+                mapOf(CHAT_ID to chatId, "from" to session.name)
+            )
         }
     }
 
@@ -71,10 +98,5 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
         repository.save(session)
 
         logger.info("$session disconnected")
-    }
-
-    companion object {
-        private const val MOD_ID = "mod-uuid"
-        private const val MOD_VERSION = "mod-version"
     }
 }

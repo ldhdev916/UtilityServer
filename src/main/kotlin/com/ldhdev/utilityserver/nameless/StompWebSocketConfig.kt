@@ -19,3 +19,7 @@ class StompWebSocketConfig : WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/topic")
     }
 }
+
+const val MOD_ID = "mod-uuid"
+const val MOD_VERSION = "mod-version"
+const val CHAT_ID = "chat-id"
