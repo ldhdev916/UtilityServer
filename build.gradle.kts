@@ -27,6 +27,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
+    implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.4")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.webjars:stomp-websocket:2.3.4")
 
