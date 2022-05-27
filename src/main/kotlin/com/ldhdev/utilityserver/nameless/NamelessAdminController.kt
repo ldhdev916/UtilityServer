@@ -1,9 +1,6 @@
 package com.ldhdev.utilityserver.nameless
 
-import com.ldhdev.namelessstd.Headers
-import com.ldhdev.namelessstd.Route
-import com.ldhdev.namelessstd.Variable
-import com.ldhdev.namelessstd.withVariables
+import com.ldhdev.namelessstd.*
 import com.ldhdev.utilityserver.db.ModPlayerSession
 import com.ldhdev.utilityserver.db.ModSessionRepository
 import kotlinx.coroutines.CompletableDeferred
@@ -44,7 +41,7 @@ class NamelessAdminController(
         }
         val deferred = CompletableDeferred<String>()
         positionDeferred.getOrPut(session.name) { mutableListOf() }.add(deferred)
-        template.convertAndSend(Route.Client.Position.withVariables(Variable.Id to session.id), "")
+        template.convertAndSend(Route.Client.Position.withVariables(Variable.Id to session.id).client, "")
 
         return runBlocking {
             runCatching {

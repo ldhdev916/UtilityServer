@@ -33,14 +33,16 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
         logger.info("$session joined")
 
         repository.save(session)
-        template.convertAndSend("/topic/$playerUUID", session.id)
+        template.convertAndSend(Route.Client.SendId.withVariables(Variable.Id to playerUUID).client, session.id)
     }
 
     @MessageMapping(Route.Server.ViewOnline)
     fun getOnlinePlayers(@Header(Headers.ModId) id: String) {
         val session = repository.findByIdOrNull(id) ?: return
         logger.info("$session requested online players")
-        template.convertAndSend("/topic/onlines/$id", repository.findByOnlineIsTrue().map { it.name })
+        template.convertAndSend(
+            Route.Client.SendOnlines.withVariables(Variable.Id to id).client,
+            repository.findByOnlineIsTrue().map { it.name })
     }
 
     @MessageMapping(Route.Server.SendChat)
@@ -56,7 +58,7 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
         logger.info("Sending a chat message '$payload' from $session to $receiverSession")
         if (receiverSession.online && session.online) {
             template.convertAndSend(
-                Route.Client.Chat.withVariables(Variable.Id to receiverSession.id).withPrefix(Prefix.Client),
+                Route.Client.Chat.withVariables(Variable.Id to receiverSession.id).client,
                 payload,
                 mapOf(Headers.Sender to session.name, Headers.ChatId to chatId)
             )
@@ -74,7 +76,7 @@ class StompChatController(private val template: SimpMessagingTemplate, private v
 
         if (session.online && senderSession.online) {
             template.convertAndSend(
-                Route.Client.NotifyRead.withVariables(Variable.Id to senderSession.id).withPrefix(Prefix.Client),
+                Route.Client.NotifyRead.withVariables(Variable.Id to senderSession.id).client,
                 "",
                 mapOf(Headers.ChatId to chatId, Headers.From to session.name)
             )

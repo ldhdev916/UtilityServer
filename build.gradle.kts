@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.ldhdev"
-version = "1.0.0"
+version = "1.0.4"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 allprojects {
@@ -43,7 +43,7 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel:$fuel")
     implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:$fuel")
 
-    implementation("com.github.ldhdev916:NamelessStd:1.0.0")
+    implementation("com.github.ldhdev916:NamelessStd:1.0.1")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
