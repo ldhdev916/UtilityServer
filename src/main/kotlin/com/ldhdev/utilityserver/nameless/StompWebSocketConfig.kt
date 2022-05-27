@@ -1,5 +1,6 @@
 package com.ldhdev.utilityserver.nameless
 
+import com.ldhdev.namelessstd.Prefix
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.simp.config.MessageBrokerRegistry
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
@@ -15,11 +16,7 @@ class StompWebSocketConfig : WebSocketMessageBrokerConfigurer {
     }
 
     override fun configureMessageBroker(registry: MessageBrokerRegistry) {
-        registry.setApplicationDestinationPrefixes("/mod")
-        registry.enableSimpleBroker("/topic")
+        registry.setApplicationDestinationPrefixes(Prefix.Server.prefix)
+        registry.enableSimpleBroker(Prefix.Client.prefix)
     }
 }
-
-const val MOD_ID = "mod-uuid"
-const val MOD_VERSION = "mod-version"
-const val CHAT_ID = "chat-id"

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="nameless@localhost" uuid="bfe18716-7f45-42e9-a97e-b12327fc64ba">
-      <driver-ref>mysql.8</driver-ref>
+    <data-source source="LOCAL" name="nameless@3.37.56.106" uuid="510788e3-a022-4f33-989e-d799e0a9fdeb">
+      <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
-      <remarks>Nameless session database</remarks>
-      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://3.37.56.106:3306/nameless</jdbc-url>
+      <remarks>Nameless sessions databse</remarks>
+      <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mariadb://3.37.56.106:3306/nameless</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

@@ -9,7 +9,7 @@ import javax.script.ScriptEngineManager
 @RestController
 class AndroidController {
 
-    private val engine by lazy { ScriptEngineManager().getEngineByExtension("kts")!! }
+    private val engine = ScriptEngineManager().getEngineByExtension("kts")!!
 
     @PostMapping("/execution")
     fun executeKotlinScript(@RequestBody code: String): ScriptResult {

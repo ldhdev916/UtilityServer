@@ -1,5 +1,9 @@
 package com.ldhdev.utilityserver.nameless
 
+import com.ldhdev.namelessstd.Headers
+import com.ldhdev.namelessstd.Route
+import com.ldhdev.namelessstd.Variable
+import com.ldhdev.namelessstd.withVariables
 import com.ldhdev.utilityserver.db.ModPlayerSession
 import com.ldhdev.utilityserver.db.ModSessionRepository
 import kotlinx.coroutines.CompletableDeferred
@@ -40,7 +44,7 @@ class NamelessAdminController(
         }
         val deferred = CompletableDeferred<String>()
         positionDeferred.getOrPut(session.name) { mutableListOf() }.add(deferred)
-        template.convertAndSend("/topic/position/${session.id}", "")
+        template.convertAndSend(Route.Client.Position.withVariables(Variable.Id to session.id), "")
 
         return runBlocking {
             runCatching {
@@ -53,8 +57,8 @@ class NamelessAdminController(
         }
     }
 
-    @MessageMapping("/position")
-    fun getPosition(@Header(MOD_ID) id: String, payload: String) {
+    @MessageMapping(Route.Server.Position)
+    fun getPosition(@Header(Headers.ModId) id: String, payload: String) {
         val session = repository.findByIdOrNull(id) ?: return
         val iterator = positionDeferred[session.name]?.listIterator() ?: return
 
