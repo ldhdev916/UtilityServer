@@ -27,7 +27,7 @@ jobs:
         with:
           repo_token: ${{ secrets.TOKEN }}
           file: ./build/libs/*.jar
-          tag: ${{ github.ref }}
+          tag: deploy
           overwrite: true
           file_glob: true
       - name: Deploy to Server
@@ -42,7 +42,7 @@ jobs:
         uses: dev-drprasad/delete-tag-and-release@v0.2.0
         with:
           delete_release: true
-          tag_name: ${{ github.ref }}
+          tag_name: deploy
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
       - name: Remove Github Actions IP from Security Group
