@@ -18,6 +18,6 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     }
 
     override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/execution")
+        web.ignoring().antMatchers("/android/**")
     }
 }
