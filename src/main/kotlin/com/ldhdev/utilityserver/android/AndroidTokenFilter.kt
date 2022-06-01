@@ -1,6 +1,5 @@
 package com.ldhdev.utilityserver.android
 
-import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import java.security.KeyFactory
 import java.security.MessageDigest
@@ -11,11 +10,12 @@ import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ReadListener
 import javax.servlet.ServletInputStream
+import javax.servlet.annotation.WebFilter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletRequestWrapper
 import javax.servlet.http.HttpServletResponse
 
-@Component
+@WebFilter("/android/execution")
 class AndroidTokenFilter : OncePerRequestFilter() {
 
     private val publicKey: PublicKey = run {
@@ -26,69 +26,60 @@ class AndroidTokenFilter : OncePerRequestFilter() {
 
     private val md = MessageDigest.getInstance("SHA-256")
 
-    private fun HttpServletResponse.sendUnauthorized() = sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
-
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val headerWithType = request.getHeader("Authorization")
-        if (headerWithType == null || !headerWithType.startsWith("Bearer ")) {
-            response.sendUnauthorized()
-            return
-        }
-        val header = headerWithType.substringAfter("Bearer ")
+        val requestWrapper = SaveCodeBodyRequest(request)
+        val authorized = isAuthorized(request.getHeader("Authorization")) { requestWrapper.code }
 
-        val split = header.split(".")
-        if (split.size != 3) {
-            response.sendUnauthorized()
-            return
-        }
-        val (code, signed, salt) = split.map {
-            runCatching {
-                Base64.getDecoder().decode(it)
-            }.getOrElse {
-                response.sendUnauthorized()
-                return
-            }
-        }
-
-        val plainBytes = md.digest(code + salt)
-        val signature = Signature.getInstance("SHA256withRSA").apply {
-            initVerify(publicKey)
-            update(plainBytes)
-        }
-
-        if (!signature.verify(signed)) {
-            response.sendUnauthorized()
+        if (!authorized) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")
             return
         }
 
-        filterChain.doFilter(AppendCodeBodyRequest(request, code), response)
+        filterChain.doFilter(requestWrapper, response)
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return request.requestURI != "/android/execution"
+        return !(request.method == "POST" && request.getHeader("Content-Type") == "text/plain")
     }
 
-    private class AppendCodeBodyRequest(wrapped: HttpServletRequest, private val code: ByteArray) :
-        HttpServletRequestWrapper(wrapped) {
+    private fun isAuthorized(authorizationWithType: String?, bodyGetter: () -> String): Boolean {
+        if (authorizationWithType == null || !authorizationWithType.startsWith("Bearer ")) return false
+        val authorization = authorizationWithType.substringAfter("Bearer ")
+        val split = authorization.split(".")
+        if (split.size != 2) return false
+        val (signed, salt) = split.map {
+            runCatching {
+                Base64.getDecoder().decode(it)
+            }.getOrElse {
+                return false
+            }
+        }
 
-        override fun getInputStream(): ServletInputStream {
+        val signature = Signature.getInstance("SHA256withRSA").apply {
+            initVerify(publicKey)
+            update(md.digest(bodyGetter().toByteArray() + salt))
+        }
+        return signature.verify(signed)
+    }
 
-            val internal = code.inputStream()
+    private class SaveCodeBodyRequest(request: HttpServletRequest) : HttpServletRequestWrapper(request) {
+        val code by lazy { request.inputStream.readBytes().decodeToString() }
 
-            return object : ServletInputStream() {
-                override fun read() = internal.read()
+        override fun getInputStream(): ServletInputStream = object : ServletInputStream() {
+            private val stream = code.byteInputStream()
 
-                override fun isFinished() = false
+            override fun read() = stream.read()
 
-                override fun isReady() = true
+            override fun isFinished() = false
 
-                override fun setReadListener(listener: ReadListener?) {
-                    throw UnsupportedOperationException()
-                }
+            override fun isReady() = true
+
+            override fun setReadListener(listener: ReadListener?) {
+                throw UnsupportedOperationException()
             }
         }
     }
