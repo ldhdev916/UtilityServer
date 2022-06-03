@@ -10,10 +10,7 @@ import org.springframework.web.server.ResponseStatusException
 class AndroidController {
 
     @PostMapping("/execution", consumes = ["text/plain"])
-    fun executeKotlinScript(
-        @RequestBody code: String,
-        @RequestParam(defaultValue = "kotlin") type: String
-    ): ScriptResult {
+    fun executeScript(@RequestBody code: String, @RequestParam(defaultValue = "kotlin") type: String): ScriptResult {
         val executor = ScriptExecutor.createScriptExecutor(type) ?: throw ResponseStatusException(
             HttpStatus.BAD_REQUEST,
             "Unknown script type $type"
