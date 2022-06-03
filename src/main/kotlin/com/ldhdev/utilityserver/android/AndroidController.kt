@@ -1,23 +1,25 @@
 package com.ldhdev.utilityserver.android
 
 import com.ldhdev.utilityserver.dto.ScriptResult
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
-import javax.script.ScriptEngineManager
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 @RequestMapping("/android")
 class AndroidController {
 
-    private val engine = ScriptEngineManager().getEngineByExtension("kts")!!
-
     @PostMapping("/execution", consumes = ["text/plain"])
-    fun executeKotlinScript(@RequestBody code: String): ScriptResult {
+    fun executeKotlinScript(
+        @RequestBody code: String,
+        @RequestParam(defaultValue = "kotlin") type: String
+    ): ScriptResult {
+        val executor = ScriptExecutor.createScriptExecutor(type) ?: throw ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Unknown script type $type"
+        )
         return runCatching {
-            val result: Any? = engine.eval(code)
-            ScriptResult.success(result.toString())
+            ScriptResult.success(executor.executeCode(code).toString())
         }.getOrElse {
             ScriptResult.failure(it)
         }
