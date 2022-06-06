@@ -1,9 +1,8 @@
 package com.ldhdev.utilityserver.db
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.ldhdev.utilityserver.dto.LocrawInfo
+import org.hibernate.Hibernate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import java.util.*
 import javax.persistence.*
 
 @Entity
@@ -11,9 +10,8 @@ import javax.persistence.*
 @EntityListeners(AuditingEntityListener::class)
 class ModPlayerSession : BaseTimeEntity() {
 
-    @Column(name = "uuid")
-    @JsonProperty("uuid")
-    lateinit var playerUUID: String
+    @Id
+    lateinit var id: String
 
     lateinit var name: String
 
@@ -23,11 +21,18 @@ class ModPlayerSession : BaseTimeEntity() {
 
     @Convert(converter = LocrawInfo.Converter::class)
     var locraw: LocrawInfo? = null
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as ModPlayerSession
 
-    @Id
-    var id = UUID.randomUUID().toString()
-    override fun toString(): String {
-        return "ModPlayerSession(playerUUID='$playerUUID', name='$name', version='$version', online=$online, locraw=$locraw, id='$id')"
+        return id == other.id
     }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+    override fun toString(): String {
+        return "ModPlayerSession(id='$id', name='$name', version='$version', online=$online, locraw=$locraw)"
+    }
+
 
 }

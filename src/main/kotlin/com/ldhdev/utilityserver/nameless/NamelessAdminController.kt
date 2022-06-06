@@ -1,14 +1,12 @@
 package com.ldhdev.utilityserver.nameless
 
-import com.ldhdev.namelessstd.*
 import com.ldhdev.utilityserver.db.ModPlayerSession
 import com.ldhdev.utilityserver.db.ModSessionRepository
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.http.ResponseEntity
-import org.springframework.messaging.handler.annotation.Header
+import org.springframework.http.HttpStatus
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.server.ResponseStatusException
 
 @Controller
 @RequestMapping("/nameless/admin")
@@ -32,31 +31,29 @@ class NamelessAdminController(
 
     @GetMapping("/position/{name}")
     @ResponseBody
-    fun getPlayerPosition(@PathVariable name: String): ResponseEntity<String> {
-        val session = repository.findByNameEqualsIgnoreCase(name) ?: return ResponseEntity.badRequest()
-            .body("Cannot find session by name $name")
-
-        if (!session.online) {
-            return ResponseEntity.unprocessableEntity().body("$session is not online")
-        }
+    fun getPlayerPosition(@PathVariable name: String): String {
+        val session = repository.findByNameEqualsIgnoreCaseAndOnlineIsTrue(name) ?: throw ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Cannot process $name"
+        )
         val deferred = CompletableDeferred<String>()
         positionDeferred.getOrPut(session.name) { mutableListOf() }.add(deferred)
-        template.convertAndSend(Route.Client.Position.withVariables(Variable.Id to session.id).client, "")
+        template.convertAndSendToUser(session.id, "/topic/position", "")
 
         return runBlocking {
             runCatching {
                 withTimeout(5000) {
-                    ResponseEntity.ok(deferred.await())
+                    deferred.await()
                 }
             }
         }.getOrElse {
-            ResponseEntity.internalServerError().body("Timed out $session")
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Timed out $session")
         }
     }
 
-    @MessageMapping(Route.Server.Position)
-    fun getPosition(@Header(Headers.ModId) id: String, payload: String) {
-        val session = repository.findByIdOrNull(id) ?: return
+    @MessageMapping("/position")
+    fun getPosition(user: NamelessUser, payload: String) {
+        val session = repository.findByIdOrNull(user.name) ?: return
         val iterator = positionDeferred[session.name]?.listIterator() ?: return
 
         for (deferred in iterator) {

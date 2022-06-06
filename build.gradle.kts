@@ -43,8 +43,6 @@ dependencies {
     implementation("com.github.kittinunf.fuel:fuel:$fuel")
     implementation("com.github.kittinunf.fuel:fuel-kotlinx-serialization:$fuel")
 
-    implementation("com.github.ldhdev916:NamelessStd:1.0.1")
-
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
