@@ -25,6 +25,7 @@ class NamelessStompController(
     @EventListener
     fun onConnect(e: SessionConnectEvent) {
         val session = repository.findByIdOrNull((e.user as NamelessUser).name) ?: return
+        template.convertAndSend("/topic/user/join", session.name)
         logger.info("$session joined")
     }
 
@@ -36,6 +37,7 @@ class NamelessStompController(
             locraw = null
         }
         repository.save(session)
+        template.convertAndSend("/topic/user/disconnect", session.name)
         logger.info("$session disconnected")
     }
 
