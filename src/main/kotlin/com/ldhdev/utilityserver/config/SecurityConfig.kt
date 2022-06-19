@@ -12,8 +12,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
 
         http
             .cors().and()
-            .csrf().ignoringAntMatchers("/android/execution")
-
+            .csrf().ignoringAntMatchers("/android/execution", "/selfTest")
         http
             .authorizeRequests()
             .antMatchers("/nameless/admin/**").authenticated()
