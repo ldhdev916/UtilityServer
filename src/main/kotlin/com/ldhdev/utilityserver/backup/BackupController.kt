@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
 import java.util.*
+import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
 @RestController
@@ -33,7 +34,9 @@ class BackupController {
         val file = File(backupDir, uuid)
         if (!file.isFile) throw ResponseStatusException(HttpStatus.BAD_REQUEST)
 
-        return file.readText()
+        GZIPInputStream(file.inputStream()).buffered().use {
+            return Base64.getEncoder().encodeToString(it.readBytes())
+        }
     }
 
     @DeleteMapping("/{uuid}")
