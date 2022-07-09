@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
 import java.util.*
-import javax.servlet.http.HttpServletResponse
+import java.util.zip.GZIPOutputStream
 
 @RestController
 @RequestMapping("/backup")
@@ -18,10 +18,13 @@ class BackupController {
     }
 
     @PostMapping
-    fun doBackup(@RequestBody content: ByteArray, response: HttpServletResponse): String {
+    fun doBackup(@RequestBody content: ByteArray): String {
         val uuid = generateBackupUUID()
 
-        File(backupDir, uuid).writeBytes(Base64.getEncoder().encode(content))
+        GZIPOutputStream(File(backupDir, uuid).outputStream()).buffered().use {
+            it.write(content)
+        }
+
         return uuid
     }
 
