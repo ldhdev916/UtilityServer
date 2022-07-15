@@ -9,16 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
-
-        http
-            .cors().and()
-            .csrf().ignoringAntMatchers("/android/execution", "/selfTest", "/backup/**")
-        http
-            .authorizeRequests()
-            .antMatchers("/nameless/admin/**").authenticated()
-
-        http
-            .formLogin()
-            .permitAll()
+        http.csrf().ignoringAntMatchers("/android/execution", "/selfTest", "/backup/**")
     }
 }
