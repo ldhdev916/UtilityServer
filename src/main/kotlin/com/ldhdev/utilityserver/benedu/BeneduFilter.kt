@@ -12,7 +12,7 @@ import javax.servlet.annotation.WebFilter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-@WebFilter("/benedu")
+@WebFilter("/benedu", "/benedu/")
 class BeneduFilter : OncePerRequestFilter() {
 
     private val publicKey by lazy {
