@@ -9,6 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
     override fun configure(http: HttpSecurity) {
-        http.csrf().ignoringAntMatchers("/android/execution", "/selfTest", "/backup/**")
+        http.csrf().ignoringAntMatchers("/android/execution", "/backup/**")
     }
 }
